@@ -1,4 +1,8 @@
-file = File.open("test.txt")
+# Ideas for future implementation
+# -------------------------------------------------
+# - a lot of repeated code that needs to be deleted
+
+file = File.open("day3.txt")
 data = file.readlines.map(&:chomp)
 
 array_length = data.length
@@ -13,98 +17,104 @@ def mode_digit(digit, array)
   return a1
 end
 
-def each_value_an_array(array)
-  b1 = []
-  array.each do |line|
-    b1 << line.split("")
-  end
-  return b1
-end
+count = 0
 
-def construct_o2_co2_array(index, init_arr, new_arr, gamma_epsilon_arr)
-  value_index = 0
-  while value_index < init_arr.length do
-    if gamma_epsilon_arr[index] == init_arr[value_index][index]
-      new_arr << init_arr[value_index]
+def find_o2_rating(count, data)   
+  array = mode_digit(count, data)
+#   puts "array = #{array}"
+  count1s = 0
+  count0s = 0
+  for num in array
+    if num == 1
+      count1s = count1s + 1
+    else
+      count0s = count0s + 1
     end
-    puts "#{new_arr}"
-    puts "----------"
-    value_index = value_index + 1
   end
-  next_new_arr = []
-  if index == gamma_epsilon_arr.length
-    return new_arr
+  index_record = 0
+  index_record_arr = []
+  if count1s >= count0s
+    for num in array
+      if num == 1
+        index_record_arr << index_record
+      end
+      index_record = index_record + 1
+    end
+    o2_array = []
+    for num in index_record_arr
+      o2_array << data[num]
+    end
+  else  #count1s < count0s
+    for num in array
+      if num == 0
+        index_record_arr << index_record
+      end
+      index_record = index_record + 1
+    end
+    o2_array = []
+    for num in index_record_arr
+      o2_array << data[num]
+    end
+  end
+#   puts "O2 array = #{o2_array}"
+#   puts "-----------------"
+  if o2_array.length == 1
+    return o2_array[0].to_i(2)  
   else
-    puts "Index is now #{index + 1}!"
-    return construct_o2_co2_array(index + 1, new_arr, next_new_arr, gamma_epsilon_arr)
-  end
+    return find_o2_rating(count + 1, o2_array)
+  end 
 end
 
-arr = each_value_an_array(data)
-
-puts "arr length is #{arr.length}"
-
-count = 0
-
-o2_co2 = []
-
-def construct_gamma_epsilon_arr(arr)
-  a = []
-  while count < num_digits
-    a << mode_digit(count, data)
-    count = count + 1
-  end
-  return a
-end
-
-a = construct_gamma_epsilon_arr(data)
-
-count = 0
-count1s = 0
-count0s = 0
-gamma = ""      # most common bit
-epsilon = ""    # least common bit; which is simply the opposite bit to the gamma-assigned bit... there has to be an easier way to do this...
-o2 = []
-co2 = []
-temp = []  
-
-def get_o2_rating(array)
-  for array in a
-    for number in array
-      if number == 1
-        count1s = count1s + 1
-      else
-        count0s = count0s + 1
-      end
+def find_co2_rating(count, data)   
+  array = mode_digit(count, data)
+#   puts "array = #{array}"
+  count1s = 0
+  count0s = 0
+  for num in array
+    if num == 1
+      count1s = count1s + 1
+    else
+      count0s = count0s + 1
     end
-    if count1s >= count0s
-      gamma = gamma + 1.to_s
-      epsilon = epsilon + 0.to_s
-      gamma_arr = gamma.split("")
-      temp = construct_o2_co2_array(0, arr, o2, gamma_arr)
-      temp.each do |arr|
-        arr.join("")
-      end
-      count = 0
-      temp = construct_gamma_epsilon_arr(count, temp)
-      return get_o2_rating(temp)
-    else 
-      gamma = gamma + 0.to_s
-      epsilon = epsilon + 1.to_s
-    end
-    count1s = 0    # reset
-    count0s = 0    # reset
-    # puts "gamma: #{gamma}"
-    # puts "epsilon: #{epsilon}"
-    # puts "==================="
   end
+  index_record = 0
+  index_record_arr = []
+  if count1s >= count0s
+    for num in array
+      if num == 0
+        index_record_arr << index_record
+      end
+      index_record = index_record + 1
+    end
+    co2_array = []
+    for num in index_record_arr
+      co2_array << data[num]
+    end
+  else  #count1s <= count0s
+    for num in array
+      if num == 1
+        index_record_arr << index_record
+      end
+      index_record = index_record + 1
+    end
+    co2_array = []
+    for num in index_record_arr
+      co2_array << data[num]
+    end
+  end
+#   puts "CO2 array = #{co2_array}"
+#   puts "-----------------"
+  if co2_array.length == 1
+    return co2_array[0].to_i(2)  
+  else
+    return find_co2_rating(count + 1, co2_array)
+  end 
 end
 
-puts "gamma: #{gamma}"
-puts "epsilon: #{epsilon}"
-puts "==================="
+ 
+puts "#{find_o2_rating(count, data)} * #{find_co2_rating(count, data)} = #{find_o2_rating(count, data) * find_co2_rating(count, data)}"
 
-gamma_arr = gamma.split("")
-epsilon_arr = epsilon.split("")
 
-puts "#{construct_o2_co2_array(0, arr, o2, gamma_arr)}"
+
+
+    
